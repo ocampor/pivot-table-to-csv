@@ -13,14 +13,13 @@ def str_xml_to_csv(xml_str, batch_string):
             row = []
 
 
-def split_xml(file_name, n_batches=5):
-    long_xml = open(file_name).read()
-    cut_size = int(len(long_xml) / n_batches)
+def split_xml(xml, n_batches=5):
+    cut_size = int(len(xml) / n_batches)
     start_index = 0
     xml_chunks = []
-    for idx in range(cut_size, len(long_xml), cut_size):
-        cut_index = _get_next_valid_index(long_xml, idx)
-        xml_chunks += [long_xml[start_index: cut_index]]
+    for idx in range(cut_size, len(xml), cut_size):
+        cut_index = _get_next_valid_index(xml, idx)
+        xml_chunks += [xml[start_index: cut_index]]
         start_index = cut_index
     return xml_chunks
 
@@ -28,6 +27,6 @@ def split_xml(file_name, n_batches=5):
 def _get_next_valid_index(xml, seed, close_tag="</r>"):
     while xml[seed:seed + len(close_tag)] != close_tag:
         seed += 1
-        if seed == len(xml):
+        if seed >= len(xml):
             return len(xml)
     return seed + len(close_tag)
