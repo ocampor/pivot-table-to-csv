@@ -1,1 +1,2 @@
 from .PivotCacheRecords import PivotCacheRecords
+from .PivotCacheDefinition import PivotCacheDefinition

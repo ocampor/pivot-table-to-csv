@@ -1,6 +1,6 @@
 from multiprocessing import Process, Manager
 from utils import xml_utils
-from utils import PivotCacheRecords
+from utils import PivotCacheRecords, PivotCacheDefinition
 import logging
 from optparse import OptionParser
 
@@ -42,7 +42,6 @@ def _parse_console_input():
         file_name = options.filename.split('.')
         options.outputname = file_name[0] + ".csv"
 
-    print(options.outputname)
     return options.filename, options.outputname, options.nchunks
 
 
@@ -64,6 +63,7 @@ if __name__ == "__main__":
 
     logging.info("Extracting pivotCacheRecords from %s..", file_name)
     xmls = PivotCacheRecords(file_name).read()
+    PivotCacheDefinition(file_name).parse()
 
     for idy, xml in zip(range(1, len(xmls) + 1), xmls):
         logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", idy, n_chunks)

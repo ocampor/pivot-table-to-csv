@@ -1,1 +1,2 @@
 lxml
+beautifulsoup4
