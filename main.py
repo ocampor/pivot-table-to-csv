@@ -2,7 +2,7 @@ import logging
 from multiprocessing import Process, Manager
 from optparse import OptionParser
 
-from models import PivotCacheRecords
+from models import PivotCacheRecords, PivotCacheDefinition
 from utils import spreadsheetml_parser
 
 
@@ -29,6 +29,10 @@ def _parse_console_input():
     return options.filename, options.outputname, options.nchunks
 
 
+def _get_header(metadata, batch_string):
+    return "^".join([column_data["column_name"] for column_data in metadata])
+
+
 def _write_csv(io, string):
     file = None
     try:
@@ -46,15 +50,21 @@ if __name__ == "__main__":
     batch_string = Manager().list()
 
     logging.info("Extracting pivotCacheRecords from %s..", file_name)
-    xmls = PivotCacheRecords(file_name).read()
+    records = PivotCacheRecords(file_name).read()
+    metadatas = PivotCacheDefinition(file_name).parse()
 
-    for idy, xml in zip(range(1, len(xmls) + 1), xmls):
+    for idy, xml in zip(range(1, len(records) + 1), records):
+        logging.info("Extracting metadata from pivotCacheDefinition")
+        header = _get_header(metadatas[idy], batch_string)
+        batch_string.append(header + '\n')
+        logging.debug(header)
+
         logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", idy, n_chunks)
         chunks = spreadsheetml_parser.split_xml(xml, n_chunks)
 
         for idx in range(len(chunks)):
             logging.info("Converting chunk %d of pivotCacheRecords%d.csv", idx, idy,)
-            valid_xml = spreadsheetml_parser.get_valid_spreadsheetml(chunks, idx)
+            valid_xml = spreadsheetml_parser.get_valid_pivot_cache_records_xml(chunks, idx)
 
             logging.debug("Chunk head %s", valid_xml[:200])
             logging.debug("Chunk tail %s", valid_xml[-200:])

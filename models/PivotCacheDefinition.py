@@ -9,10 +9,11 @@ class PivotCacheDefinition(PivotCache):
         self.file_name = file_name
 
     def parse(self):
-        xml = self.read().pop()
-        soup = BeautifulSoup(xml, "xml")
-        columns_metadata = soup.findAll("cacheField")
-        return map(PivotCacheDefinition.parse_column_metadata, columns_metadata)
+        xmls = self.read()
+        soups = [BeautifulSoup(xml, "xml") for xml in xmls]
+        columns_metadatas = [soup.findAll("cacheField") for soup in soups]
+        return [map(PivotCacheDefinition.parse_column_metadata, columns_metadata)
+                for columns_metadata in columns_metadatas]
 
     @staticmethod
     def parse_column_metadata(column_metadata):

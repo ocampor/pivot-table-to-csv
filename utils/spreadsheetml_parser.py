@@ -25,7 +25,7 @@ def split_xml(xml, n_batches=5):
     return xml_chunks
 
 
-def get_valid_spreadsheetml(file_chunks, index):
+def get_valid_pivot_cache_records_xml(file_chunks, index):
     header = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                     <pivotCacheRecords 
                         xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
