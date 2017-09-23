@@ -1,6 +1,15 @@
+import pytest
+
 from models import PivotCacheDefinition
 
 
-class test_PivotCacheDefinition():
-    print(PivotCacheDefinition("/home/ocampor/AMIS/SESAS_2016/TD MT Robo Total 2016.xlsx").parse())
-    assert False
+@pytest.fixture
+def pivot_cache():
+    return PivotCacheDefinition("tests/resources/pivot_table_test.xlsx")
+
+
+def test_PivotCacheDefinition_characteristics(pivot_cache):
+    n_columns = 32
+    pivot_cache_definition = pivot_cache.parse()
+    assert type(pivot_cache_definition) is map
+    assert len(list(pivot_cache_definition)) == n_columns
