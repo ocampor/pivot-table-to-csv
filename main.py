@@ -1,25 +1,9 @@
-from multiprocessing import Process, Manager
-from utils import xml_utils
-from utils import PivotCacheRecords, PivotCacheDefinition
 import logging
+from multiprocessing import Process, Manager
 from optparse import OptionParser
 
-
-def _get_valid_xml(file_chunks, index):
-    header = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                    <pivotCacheRecords 
-                        xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-                        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="xr"
-                        xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" count="2647949">
-    """
-    footer = "</pivotCacheRecords>"
-    if index == 0:
-        return file_chunks[index] + footer
-    elif index == len(file_chunks) - 1:
-        return header + file_chunks[index]
-    else:
-        return header + file_chunks[index] + footer
+from models import PivotCacheRecords
+from utils import spreadsheetml_parser
 
 
 def _parse_console_input():
@@ -63,19 +47,18 @@ if __name__ == "__main__":
 
     logging.info("Extracting pivotCacheRecords from %s..", file_name)
     xmls = PivotCacheRecords(file_name).read()
-    PivotCacheDefinition(file_name).parse()
 
     for idy, xml in zip(range(1, len(xmls) + 1), xmls):
         logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", idy, n_chunks)
-        chunks = xml_utils.split_xml(xml, n_chunks)
+        chunks = spreadsheetml_parser.split_xml(xml, n_chunks)
 
         for idx in range(len(chunks)):
             logging.info("Converting chunk %d of pivotCacheRecords%d.csv", idx, idy,)
-            valid_xml = _get_valid_xml(chunks, idx)
+            valid_xml = spreadsheetml_parser.get_valid_spreadsheetml(chunks, idx)
 
             logging.debug("Chunk head %s", valid_xml[:200])
             logging.debug("Chunk tail %s", valid_xml[-200:])
-            p = Process(target=xml_utils.str_xml_to_csv, args=(valid_xml, batch_string, ))
+            p = Process(target=spreadsheetml_parser.str_xml_to_csv, args=(valid_xml, batch_string,))
 
             p.start()
             p.join()

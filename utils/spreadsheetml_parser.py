@@ -1,5 +1,6 @@
-from lxml import etree
 from io import BytesIO
+
+from lxml import etree
 
 
 def str_xml_to_csv(xml_str, batch_string):
@@ -24,9 +25,28 @@ def split_xml(xml, n_batches=5):
     return xml_chunks
 
 
+def get_valid_spreadsheetml(file_chunks, index):
+    header = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                    <pivotCacheRecords 
+                        xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+                        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="xr"
+                        xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" count="2647949">
+    """
+    footer = "</pivotCacheRecords>"
+    if index == 0:
+        return file_chunks[index] + footer
+    elif index == len(file_chunks) - 1:
+        return header + file_chunks[index]
+    else:
+        return header + file_chunks[index] + footer
+
+
 def _get_next_valid_index(xml, seed, close_tag="</r>"):
     while xml[seed:seed + len(close_tag)] != close_tag:
         seed += 1
         if seed >= len(xml):
             return len(xml)
     return seed + len(close_tag)
+
+
