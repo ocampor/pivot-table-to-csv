@@ -20,7 +20,7 @@ class PivotCacheDefinition(PivotCache):
     def parse_column_metadata(column_metadata):
         levels = PivotCacheDefinition.parse_shared_items(column_metadata.find("sharedItems"))
         return {
-            "column_name": column_metadata["name"],
+            "column_name": cast_tag_value("s", column_metadata["name"]),
             "is_categorical": len(levels) > 0,
             "levels": levels
         }

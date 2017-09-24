@@ -30,7 +30,7 @@ def _parse_console_input():
 
 
 def _get_header(metadata):
-    return "^".join([column_data["column_name"] for column_data in metadata])
+    return ",".join([column_data["column_name"] for column_data in metadata])
 
 
 def _write_csv(io, string):
@@ -74,6 +74,7 @@ if __name__ == "__main__":
             p.start()
             p.join()
             logging.info("Chunk %d of pivotCacheRecords%d.csv successfully converted", idx, idy)
+            break
 
         logging.info("Saving result in %s...", output_file)
         _write_csv(output_file + '-' + str(idy), batch_string)

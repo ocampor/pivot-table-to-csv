@@ -9,10 +9,10 @@ def str_xml_to_csv(xml_str, batch_string, metadata=None):
     idx = 0
     for _, elem in context:
         if elem.tag[-1] != "r":
-            row += [_replace_value_with_categorical_label(elem.get("v", ""), metadata[idx])]
+            row += [get_value(elem.get("v", ""), elem.tag[-1], metadata[idx])]
             idx += 1
         else:
-            batch_string.append("^".join(row) + "\n")
+            batch_string.append(",".join(row) + "\n")
             row = []
             idx = 0
 
@@ -28,13 +28,26 @@ def split_xml(xml, n_batches=5):
     return xml_chunks
 
 
-def ast_tag_value(tag, value):
-    if tag == "s":
-        return str(value)
-    elif tag == "n":
-        return int(value)
+def get_value(value, tag, metadata=None):
+    if metadata is None or value == "":
+        return cast_tag_value(tag, value)
+    elif tag == "x":
+        return cast_tag_value(tag, metadata["levels"][int(value)])
     else:
-        raise TypeError("Tag %s is not defined to be cased" % tag)
+        return cast_tag_value(tag, value)
+
+
+def cast_string(value):
+    return '"{0}"'.format(value)
+
+
+def cast_tag_value(tag, value):
+    if tag == "s":
+        return cast_string(value)
+    elif tag == "n" or tag == "x" or tag == "m":
+        return value
+    else:
+        raise TypeError("Tag {0} is not defined to be cased".format(tag))
 
 
 def get_valid_pivot_cache_records_xml(file_chunks, index):
@@ -60,15 +73,6 @@ def _get_next_valid_index(xml, seed, close_tag="</r>"):
         if seed >= len(xml):
             return len(xml)
     return seed + len(close_tag)
-
-
-def _replace_value_with_categorical_label(value, metadata):
-    if metadata is None or value == "":
-        return value
-    elif metadata["is_categorical"]:
-        return metadata["levels"][int(value)]
-    else:
-        return value
 
 
 
