@@ -42,12 +42,10 @@ def cast_string(value):
 
 
 def cast_tag_value(tag, value):
-    if tag == "s":
+    if tag == "s" or tag == "e":
         return cast_string(value)
     elif tag == "n" or tag == "x" or tag == "m":
         return value
-    elif tag == "e":  # Missing value represented by N/A
-        return ""
     else:
         raise TypeError("Tag {0} is not defined to be casted".format(tag))
 

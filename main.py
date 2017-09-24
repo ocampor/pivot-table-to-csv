@@ -49,7 +49,6 @@ def _write_csv(io, string):
 
 if __name__ == "__main__":
     file_name, output_file, n_chunks = _parse_console_input()
-    batch_string = Manager().list()
 
     logging.info("Extracting pivotCacheRecords from %s..", file_name)
     records = PivotCacheRecords(file_name).read()
@@ -58,12 +57,16 @@ if __name__ == "__main__":
     bar = progressbar.ProgressBar(max_value=len(records) * n_chunks + 5)
     for idy, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         bar.update(0)
+        batch_string = Manager().list()
+
         logging.info("Extracting metadata from pivotCacheDefinition")
         metadata = list(metadata)
         logging.debug(metadata)
+
         header = _get_header(metadata)
         batch_string.append(header + '\n')
         logging.debug(header)
+
         logging.info("Splitting pivotCacheRecords%d.xml into %d chunks", idy, n_chunks)
         chunks = spreadsheetml_parser.split_xml(xml, n_chunks)
 
