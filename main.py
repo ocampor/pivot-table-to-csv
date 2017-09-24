@@ -74,7 +74,6 @@ if __name__ == "__main__":
             p.start()
             p.join()
             logging.info("Chunk %d of pivotCacheRecords%d.csv successfully converted", idx, idy)
-            break
 
         logging.info("Saving result in %s...", output_file)
         _write_csv(output_file + '-' + str(idy), batch_string)
