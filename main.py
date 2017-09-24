@@ -2,6 +2,8 @@ import logging
 from multiprocessing import Process, Manager
 from optparse import OptionParser
 
+import progressbar
+
 from models import PivotCacheRecords, PivotCacheDefinition
 from utils import spreadsheetml_parser
 
@@ -11,7 +13,7 @@ def _parse_console_input():
     parser.add_option("-f", "--file", dest="filename",
                       help="Path to input file", metavar="FILE")
     parser.add_option("-o", "--output", dest="outputname",
-                      help="Path to output file", metavar="FILE")
+                      help="Number of pieces to split before converting the file", metavar="FILE")
     parser.add_option("-n", "--nchunks", dest="nchunks", default=5, type="int",
                       help="Path to output file", metavar="FILE")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
@@ -53,7 +55,9 @@ if __name__ == "__main__":
     records = PivotCacheRecords(file_name).read()
     metadatas = PivotCacheDefinition(file_name).parse()
 
+    bar = progressbar.ProgressBar(max_value=len(records) * n_chunks + 5)
     for idy, xml in zip(range(1, len(records) + 1), records):
+        bar.update(0)
         logging.info("Extracting metadata from pivotCacheDefinition")
         metadata = list(metadatas.pop())
         logging.debug(metadata)
@@ -74,6 +78,7 @@ if __name__ == "__main__":
             p.start()
             p.join()
             logging.info("Chunk %d of pivotCacheRecords%d.csv successfully converted", idx, idy)
+            bar.update(int((idx + 1) * idy))
 
         logging.info("Saving result in %s...", output_file)
         _write_csv(output_file + '-' + str(idy), batch_string)
