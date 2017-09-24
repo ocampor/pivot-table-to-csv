@@ -1,10 +1,10 @@
 # Pivot Table to CSV
 
-*This repository takes a `*.xslx` that contains a Pivot Table with hidden external source data and converts the pivot cache into a text file with `^` separated values. It takes into account files that are too big to be in memory and handles this situation by dividing the original data into `n` batches.*
+*This repository takes a `*.xslx` that contains a Pivot Table with hidden external source data and converts the pivot cache into a text file with `,` separated values. It takes into account files that are too big to be in memory and handles this situation by dividing the original data into `n` batches.*
 
 ## Documentation
 ### Methodology
-This codes unzips the `xlsx` file and extracts the data contained in the `pivotCacheRecords{0}.xlm` files. The pivot cache records are parsed and organized into a `^` separated values.  
+This codes unzips the `xlsx` file and extracts the data contained in the `pivotCacheRecords{0}.xlm` files. The pivot cache records are parsed and organized into a `,` separated values.  
 
 ## Getting Started
 ### Prerequisites
@@ -15,6 +15,13 @@ This codes unzips the `xlsx` file and extracts the data contained in the `pivotC
 1. Install python 3.6 and pip
 1. Create a virtual environtment `virtualenv --python=python3.6 .venv` and source it `source .venv/bin/activate`
 1. Install python requirements `pip install -r requirements.txt`
+
+## Run code
+You can run the code by executing `python main.py`. The options are the following:
+1. `-f` or `--file` a required option that specifies the file to convert.
+1. `-o` or `--output` optional option that specifies the desired output file name.
+1. `-n` or `--nchunks` the number or pieces to split original file before converting. It is recommended to split the file into 5 pieces for excel files of size 100 mb. The latter recommendation for equipments with 16 gb of RAM. 
+1. `-v` or `--verbose` activates DEBUG level of logging.
 
 ## Running the tests
 1. Run `py.test`
