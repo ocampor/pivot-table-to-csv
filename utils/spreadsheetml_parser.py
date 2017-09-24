@@ -3,15 +3,18 @@ from io import BytesIO
 from lxml import etree
 
 
-def str_xml_to_csv(xml_str, batch_string):
+def str_xml_to_csv(xml_str, batch_string, metadata=None):
     context = etree.iterparse(BytesIO(xml_str.encode("utf-8")))
     row = []
+    idx = 0
     for _, elem in context:
         if elem.tag[-1] != "r":
-            row += [elem.get("v", "")]
+            row += [_replace_value_with_categorical_label(elem.get("v", ""), metadata[idx])]
+            idx += 1
         else:
             batch_string.append("^".join(row) + "\n")
             row = []
+            idx = 0
 
 
 def split_xml(xml, n_batches=5):
@@ -23,6 +26,15 @@ def split_xml(xml, n_batches=5):
         xml_chunks += [xml[start_index: cut_index]]
         start_index = cut_index
     return xml_chunks
+
+
+def ast_tag_value(tag, value):
+    if tag == "s":
+        return str(value)
+    elif tag == "n":
+        return int(value)
+    else:
+        raise TypeError("Tag %s is not defined to be cased" % tag)
 
 
 def get_valid_pivot_cache_records_xml(file_chunks, index):
@@ -48,5 +60,15 @@ def _get_next_valid_index(xml, seed, close_tag="</r>"):
         if seed >= len(xml):
             return len(xml)
     return seed + len(close_tag)
+
+
+def _replace_value_with_categorical_label(value, metadata):
+    if metadata is None or value == "":
+        return value
+    elif metadata["is_categorical"]:
+        return metadata["levels"][int(value)]
+    else:
+        return value
+
 
 

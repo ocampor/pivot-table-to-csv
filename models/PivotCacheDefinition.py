@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
 from models import PivotCache
+from utils import cast_tag_value
 
 
 class PivotCacheDefinition(PivotCache):
@@ -17,9 +18,11 @@ class PivotCacheDefinition(PivotCache):
 
     @staticmethod
     def parse_column_metadata(column_metadata):
+        levels = PivotCacheDefinition.parse_shared_items(column_metadata.find("sharedItems"))
         return {
             "column_name": column_metadata["name"],
-            "levels": PivotCacheDefinition.parse_shared_items(column_metadata.find("sharedItems"))
+            "is_categorical": len(levels) > 0,
+            "levels": levels
         }
 
     @staticmethod
@@ -27,13 +30,4 @@ class PivotCacheDefinition(PivotCache):
         levels_tags = []
         if shared_items is not None:
             levels_tags = shared_items.findAll()
-        return [PivotCacheDefinition._cast_level_tag_value(item.name, item["v"]) for item in levels_tags]
-
-    @staticmethod
-    def _cast_level_tag_value(tag, value):
-        if tag == "s":
-            return str(value)
-        elif tag == "n":
-            return str(value)
-        else:
-            raise TypeError("Tag %s is not defined to be cased" % tag)
+        return [cast_tag_value(item.name, item["v"]) for item in levels_tags]
