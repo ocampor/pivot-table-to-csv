@@ -8,6 +8,7 @@ class PivotCache:
     def open(self):
         xlsx_file = zipfile.ZipFile(self.file_name)
         cache_names = list(filter(lambda x: self.pivot_cache_name in x and x[-3:] == "xml", xlsx_file.namelist()))
+        cache_names = sorted(cache_names)
         if len(cache_names) == 0:
             error_message = "Could not find any {0}: It is not a PivotTable excel file"
             raise Exception(error_message.format(self.pivot_cache_name))

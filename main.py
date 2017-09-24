@@ -56,10 +56,10 @@ if __name__ == "__main__":
     metadatas = PivotCacheDefinition(file_name).parse()
 
     bar = progressbar.ProgressBar(max_value=len(records) * n_chunks + 5)
-    for idy, xml in zip(range(1, len(records) + 1), records):
+    for idy, xml, metadata in zip(range(1, len(records) + 1), records, metadatas):
         bar.update(0)
         logging.info("Extracting metadata from pivotCacheDefinition")
-        metadata = list(metadatas.pop())
+        metadata = list(metadata)
         logging.debug(metadata)
         header = _get_header(metadata)
         batch_string.append(header + '\n')

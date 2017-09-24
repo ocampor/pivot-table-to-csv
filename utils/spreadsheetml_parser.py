@@ -46,8 +46,10 @@ def cast_tag_value(tag, value):
         return cast_string(value)
     elif tag == "n" or tag == "x" or tag == "m":
         return value
+    elif tag == "e":  # Missing value represented by N/A
+        return ""
     else:
-        raise TypeError("Tag {0} is not defined to be cased".format(tag))
+        raise TypeError("Tag {0} is not defined to be casted".format(tag))
 
 
 def get_valid_pivot_cache_records_xml(file_chunks, index):
