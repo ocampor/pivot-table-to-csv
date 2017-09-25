@@ -21,7 +21,7 @@ def split_xml(xml, n_batches=5):
     cut_size = int(len(xml) / n_batches)
     start_index = 0
     xml_chunks = []
-    for idx in range(cut_size, len(xml), cut_size):
+    for idx in range(cut_size, len(xml), cut_size - 1):
         cut_index = _get_next_valid_index(xml, idx)
         xml_chunks += [xml[start_index: cut_index]]
         start_index = cut_index
