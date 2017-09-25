@@ -30,4 +30,4 @@ class PivotCacheDefinition(PivotCache):
         levels_tags = []
         if shared_items is not None:
             levels_tags = shared_items.findAll()
-        return [cast_tag_value(item.name, item["v"]) for item in levels_tags]
+        return [cast_tag_value(item.name, item.get("v", "")) for item in levels_tags]
