@@ -44,7 +44,7 @@ def cast_string(value):
 def cast_tag_value(tag, value):
     if tag == "s" or tag == "e":
         return cast_string(value)
-    elif tag == "n" or tag == "x" or tag == "m":
+    elif tag == "n" or tag == "x" or tag == "m" or tag =="d":
         return value
     else:
         raise TypeError("Tag {0} is not defined to be casted".format(tag))
