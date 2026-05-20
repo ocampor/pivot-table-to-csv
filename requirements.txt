@@ -1,4 +1,4 @@
 lxml==4.0.0
 beautifulsoup4==4.6.0
-pytest==3.2.2
+pytest==9.0.3
 progressbar2==3.34.3
